@@ -150,7 +150,6 @@ fn parse_file(code : String) -> Vec<Token> {
                             "add" => {token_type = Keyword::ADD; line_add += 1},
                             "ifeq" => {token_type = Keyword::IFEQ; line_add += 1},
                             "jump" => {token_type = Keyword::JUMP},
-                            "jumpa" => {token_type = Keyword::JUMPA},
                             "print" => {token_type = Keyword::PRINT; line_add += 1},
                             "dup" => {token_type = Keyword::DUP; line_add += 1},
                             "save" => {token_type = Keyword::SAVE},
@@ -166,7 +165,6 @@ fn parse_file(code : String) -> Vec<Token> {
                             line : line
                         };
 
-                        //println!("line: {} text: {} id: {}\n", &line, &curr_token.text, &id);
                         tokens.push(curr_token);
 
                         // Reset the current token and state
@@ -187,7 +185,6 @@ fn parse_file(code : String) -> Vec<Token> {
                             line : line
                         };
 
-                        //println!("line: {} text: {} id: {}\n", &line, &curr_token.text, &id);
                         tokens.push(curr_token);
 
                         // Reset the current token and state
@@ -290,14 +287,22 @@ fn run (tokens : Vec<Token>) {
                     }
 
                     if x == 0 {
-                        current_id += 1;
+                        current_id += 2;
                     }
                     else {
                         current_id += 1;
                         // Get the address token
                         if let Some(ref num) = tokens.get(current_id) {
+                            match num.key {
+                            Keyword::ADDRESS => {
+                                current_id = get_address_name(&num.text, &tokens);
+                            },
 
-                            current_id = get_address(num.text.parse::<i32>().unwrap(), &tokens);
+                            Keyword::NUMBER => {
+                                current_id = get_address(num.text.parse::<i32>().unwrap(), &tokens);
+                            },
+                            _ => panic!("at the disco")
+                        }
                         }
                     }
                     continue;
@@ -307,7 +312,16 @@ fn run (tokens : Vec<Token>) {
                     // Get the address token
                     if let Some(ref num) = tokens.get(current_id) {
 
-                        current_id = get_address(num.text.parse::<i32>().unwrap(), &tokens);
+                        match num.key {
+                            Keyword::ADDRESS => {
+                                current_id = get_address_name(&num.text, &tokens);
+                            },
+
+                            Keyword::NUMBER => {
+                                current_id = get_address(num.text.parse::<i32>().unwrap(), &tokens);
+                            },
+                            _ => panic!("at the disco")
+                        }
                     }
 
                     continue;
@@ -385,16 +399,6 @@ fn run (tokens : Vec<Token>) {
 
                     current_id += 1;
                 },
-                JUMPA => {
-                    current_id += 1;
-                    // Get the address token
-                    if let Some(ref num) = tokens.get(current_id) {
-
-                        current_id = get_address_name(&num.text, &tokens);
-                    }
-
-                    continue;
-                },
                 ADDRESSKEY => {
                     current_id += 1;
                 }
@@ -449,7 +453,6 @@ enum Keyword {
     ADD,
     IFEQ,
     JUMP,
-    JUMPA,
     PRINT,
     DUP,
     NUMBER,

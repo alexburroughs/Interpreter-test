@@ -15,11 +15,12 @@ add
 print
 save 2
 restore 0
-ifeq 24
+ifeq end
 restore 0
 push -1
 add
 save 0
-jumpa start
+end:
+jump start
 push 10101010
 print
