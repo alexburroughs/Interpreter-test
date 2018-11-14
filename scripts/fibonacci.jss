@@ -16,6 +16,12 @@ restore 2
 save 1
 restore 1
 restore 0
-ifeq 7
+ifeq end
+restore 0
+push -1
+add
+save 0
+end:
+jump start
 push 10101010
 print
