@@ -7,6 +7,10 @@ push 1
 print
 save 2
 start:
+restore 0
+push -1
+add
+save 0
 restore 1
 restore 2
 save 1
@@ -15,11 +19,6 @@ add
 print
 save 2
 restore 0
-ifeq 24
-restore 0
-push -1
-add
-save 0
-jumpa start
+ifeq 10
 push 10101010
 print
