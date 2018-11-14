@@ -138,6 +138,8 @@ fn parse_file(code : String) -> Vec<Token> {
                             "jump" => {token_type = Keyword::JUMP},
                             "print" => {token_type = Keyword::PRINT; line_add += 1},
                             "dup" => {token_type = Keyword::DUP; line_add += 1},
+                            "save" => {token_type = Keyword::SAVE},
+                            "restore" => {token_type = Keyword::RESTORE},
                             _ => panic!("Error")
                         }
 
@@ -178,6 +180,7 @@ fn run (tokens : Vec<Token>) {
     use Keyword::*;
 
     let mut num_stack : Vec<i32> = Vec::new();
+    let mut memory = [0; 1024];
 
     let mut current_id = 0;
 
@@ -309,6 +312,34 @@ fn run (tokens : Vec<Token>) {
                     // END OF LAZY CODE
                     current_id += 1;
                 },
+                SAVE => {
+                    current_id += 1;
+                    // Get the address token
+                    if let Some(ref num) = tokens.get(current_id) {
+                        let parsed_num = num.text.parse::<u32>().unwrap();
+                        if parsed_num >= 1024 {
+                            panic!("Runtime Error: cannot save to address. Must be between 0-1023 inc.");
+                        }
+
+                        memory[parsed_num as usize] = num_stack.pop().unwrap();
+                    }
+
+                    current_id += 1;
+                },
+                RESTORE => {
+                    current_id += 1;
+                    // Get the address token
+                    if let Some(ref num) = tokens.get(current_id) {
+                        let parsed_num = num.text.parse::<u32>().unwrap();
+                        if parsed_num >= 1024 {
+                            panic!("Runtime Error: cannot restore from address. Must be between 0-1023 inc.");
+                        }
+
+                        num_stack.push(memory[parsed_num as usize]);
+                    }
+
+                    current_id += 1;
+                },
                 _ => panic!("Runtime Error")
             }
         }
@@ -346,7 +377,9 @@ enum Keyword {
     JUMP,
     PRINT,
     DUP,
-    NUMBER
+    NUMBER,
+    SAVE,
+    RESTORE
 }
 
 enum State {
