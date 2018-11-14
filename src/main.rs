@@ -61,7 +61,7 @@ fn parse_file(code : String) -> Vec<Token> {
                     if *curr == '/' {
                         state = COMMENT;
                     }
-                    else if tmp.is_digit(10) {
+                    else if tmp.is_digit(10) || *curr == '-' {
 
                         // temporary clone of tmp so it can be used TODO: maybe delete?
                         let curr = tmp.clone();
@@ -125,6 +125,9 @@ fn parse_file(code : String) -> Vec<Token> {
                     }
                 },
                 KEY => {
+
+                    let curr = tmp.clone();
+
                     if tmp.is_ascii_alphabetic() {
 
                         // Continue pushing chars onto the current token
@@ -147,11 +150,12 @@ fn parse_file(code : String) -> Vec<Token> {
                             "add" => {token_type = Keyword::ADD; line_add += 1},
                             "ifeq" => {token_type = Keyword::IFEQ; line_add += 1},
                             "jump" => {token_type = Keyword::JUMP},
+                            "jumpa" => {token_type = Keyword::JUMPA},
                             "print" => {token_type = Keyword::PRINT; line_add += 1},
                             "dup" => {token_type = Keyword::DUP; line_add += 1},
                             "save" => {token_type = Keyword::SAVE},
                             "restore" => {token_type = Keyword::RESTORE},
-                            _ => panic!("Error")
+                            _ => {token_type = Keyword::ADDRESS}
                         }
 
                         // Make the token and push onto tokens list
@@ -170,6 +174,27 @@ fn parse_file(code : String) -> Vec<Token> {
                         state = START;
 
                         line += line_add;
+                        id += 1;
+                    }
+
+                    else if *curr == ':' {
+                        
+                        // Make the token and push onto tokens list
+                        let curr_token = Token {
+                            id : id,
+                            key : Keyword::ADDRESSKEY,
+                            text : current.clone(),
+                            line : line
+                        };
+
+                        //println!("line: {} text: {} id: {}\n", &line, &curr_token.text, &id);
+                        tokens.push(curr_token);
+
+                        // Reset the current token and state
+                        current = String::new();
+                        state = START;
+
+                        line += 1;
                         id += 1;
                     }
 
@@ -360,6 +385,19 @@ fn run (tokens : Vec<Token>) {
 
                     current_id += 1;
                 },
+                JUMPA => {
+                    current_id += 1;
+                    // Get the address token
+                    if let Some(ref num) = tokens.get(current_id) {
+
+                        current_id = get_address_name(&num.text, &tokens);
+                    }
+
+                    continue;
+                },
+                ADDRESSKEY => {
+                    current_id += 1;
+                }
                 _ => panic!("Runtime Error: oh no, a bug in the interpreter")
             }
         }
@@ -382,6 +420,22 @@ fn get_address(address: i32, tokens : &Vec<Token>) -> usize {
     panic!("Runtime Error: invalid line number (lines start at 1)");
 }
 
+fn get_address_name(address: &String, tokens: &Vec<Token>) -> usize {
+
+    for x in tokens {
+        match x.key {
+            Keyword::ADDRESSKEY => {
+                if x.text == *address {
+                    return x.id;
+                }
+            },
+            _ => continue
+        }
+    }
+
+    panic!("Runtime Error: invalid line number (lines start at 1)");
+}
+
 struct Token {
     id : usize,
     key : Keyword,
@@ -395,11 +449,14 @@ enum Keyword {
     ADD,
     IFEQ,
     JUMP,
+    JUMPA,
     PRINT,
     DUP,
     NUMBER,
     SAVE,
-    RESTORE
+    RESTORE,
+    ADDRESS,
+    ADDRESSKEY
 }
 
 enum State {

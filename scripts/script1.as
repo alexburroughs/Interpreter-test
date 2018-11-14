@@ -1,6 +1,5 @@
 push 1
-push 1
-/push 2 1's onto the stack/
+point:
+push -1
 add
 print
-jump 2
