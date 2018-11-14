@@ -6,6 +6,11 @@ fn main() {
 
     // Get arguments (source code path)
     let args: Vec<String> = env::args().collect();
+
+    if args.len() < 2 {
+        panic!("please provide a filename as an argument");
+    }
+
     let filename = &args[1];
 
     // Open file
@@ -50,7 +55,13 @@ fn parse_file(code : String) -> Vec<Token> {
 
             match state {
                 START => {
-                    if tmp.is_digit(10) {
+
+                    let curr = tmp.clone();
+
+                    if *curr == '/' {
+                        state = COMMENT;
+                    }
+                    else if tmp.is_digit(10) {
 
                         // temporary clone of tmp so it can be used TODO: maybe delete?
                         let curr = tmp.clone();
@@ -167,6 +178,15 @@ fn parse_file(code : String) -> Vec<Token> {
                         panic!("Error in parsing");
                     }
                 }
+
+                COMMENT => {
+                    
+                    let curr = tmp.clone();
+
+                    if *curr == '/' {
+                        state = START;
+                    }
+                }
             }
         }
 
@@ -201,7 +221,7 @@ fn run (tokens : Vec<Token>) {
                 },
                 POP => {
                     if num_stack.len() < 1{
-                        panic!("Runtime Error: too much poping");
+                        panic!("Runtime Error: too much popping");
                     }
                     
                     num_stack.pop();
@@ -211,7 +231,7 @@ fn run (tokens : Vec<Token>) {
                 ADD => {
                     //println!("len: {}", num_stack.len());
                     if num_stack.len() < 2 {
-                        panic!("Runtime Error: too much poping");
+                        panic!("Runtime Error: too much popping");
                     }
 
                     let x : i32;
@@ -233,8 +253,8 @@ fn run (tokens : Vec<Token>) {
                 },
                 IFEQ => {
 
-                    if num_stack.len() < 1{
-                        panic!("Runtime Error: too much poping");
+                    if num_stack.len() < 1 {
+                        panic!("Runtime Error: too much popping");
                     }
 
                     let x : i32;
@@ -340,7 +360,7 @@ fn run (tokens : Vec<Token>) {
 
                     current_id += 1;
                 },
-                _ => panic!("Runtime Error")
+                _ => panic!("Runtime Error: oh no, a bug in the interpreter")
             }
         }
     } 
@@ -385,5 +405,6 @@ enum Keyword {
 enum State {
     START,
     NUMBER,
-    KEY
+    KEY,
+    COMMENT
 }
