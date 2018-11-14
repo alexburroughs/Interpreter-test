@@ -290,7 +290,7 @@ fn run (tokens : Vec<Token>) {
                     }
 
                     if x == 0 {
-                        current_id += 1;
+                        current_id += 2;
                     }
                     else {
                         current_id += 1;
