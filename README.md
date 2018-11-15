@@ -4,6 +4,8 @@ JessieScript (JSS) is a new interpreted language similar to 6502 Assembly, but u
 
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/alexburroughs/JessieScript.svg?columns=all)](https://waffle.io/alexburroughs/JessieScript)
 
+[![Build Status](https://travis-ci.org/alexburroughs/JessieScript.svg?branch=master)](https://travis-ci.org/alexburroughs/JessieScript)
+
 
 ## Getting Started
 
