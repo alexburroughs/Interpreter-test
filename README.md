@@ -1,6 +1,6 @@
 # JessieScript
 
-JessieScript (JSS) is a new interpreted language similar to 6502 Assembly, but uses a stack instead of traditional registries. This allows for quicker implementation of certain features and makes it easier to compile into.
+JessieScript (JSS) is a new interpreted language similar to 6502 Assembly, but uses a stack instead of traditional registers. This allows for quicker implementation of certain features and makes it easier to compile into.
 
 [![Waffle.io - Columns and their card count](https://badge.waffle.io/alexburroughs/JessieScript.svg?columns=all)](https://waffle.io/alexburroughs/JessieScript)
 
