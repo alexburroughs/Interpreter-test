@@ -285,6 +285,8 @@ fn run (tokens : Vec<Token>) {
                         Some(ref a) => {x = *a},
                         None => panic!()
                     }
+                    
+                    num_stack.push(x);
 
                     if x == 0 {
                         current_id += 2;

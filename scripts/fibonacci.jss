@@ -3,8 +3,8 @@ save 0
 push 0
 print
 push 1
-start:
 restore 0
+start:
 push -1
 add
 save 0
