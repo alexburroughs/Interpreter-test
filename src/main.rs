@@ -2,6 +2,15 @@ use std::env;
 use std::fs::File;
 use std::io::prelude::*;
 
+const CHARS: [&'static str; 96] = [" ","!","\"","#","$","%",
+"&","'","(",")","*","+",",","-",".","/","0","1","2","3","4",
+"5","6","7","8","9",":",";","<","=",">","?","@","A","B","C",
+"D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R",
+"S","T","U","V","W","X","Y","Z","[", "\\" ,"]","^","_","`",
+"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o",
+"p","q","r","s","t","u","v","w","x","y","z","{","|","}","~",
+"",];
+
 fn main() {
 
     // Get arguments (source code path)
@@ -154,6 +163,7 @@ fn parse_file(code : String) -> Vec<Token> {
                             "dup" => {token_type = Keyword::DUP; line_add += 1},
                             "save" => {token_type = Keyword::SAVE},
                             "restore" => {token_type = Keyword::RESTORE},
+                            "printc" => {token_type = Keyword::PRINTC}
                             _ => {token_type = Keyword::ADDRESS}
                         }
 
@@ -351,6 +361,45 @@ fn run (tokens : Vec<Token>) {
                     // END OF LAZY CODE
                     current_id += 1;
                 },
+                PRINTC => {
+
+                    current_id+=1;
+                    if let Some(ref num) = tokens.get(current_id) {
+
+                        let mut tmp_stack : Vec<i32> = Vec::new();
+                        let parsed_num = num.text.parse::<u32>().unwrap();
+                        for _x in 0..parsed_num {
+                            if num_stack.len() < 1{
+                                panic!("Runtime Error: not enough pushing");
+                            }
+
+                            let x : i32;
+                            match num_stack.pop() {
+                                Some(ref a) => {x = *a},
+                                None => panic!()
+                            }
+
+                            print!("{}", get_char_code(x));
+
+
+                            tmp_stack.push(x);
+                        }
+                        println!();
+
+                        for _x in 0..parsed_num {
+                            let x : i32;
+
+                            match tmp_stack.pop() {
+                            Some(ref a) => {x = *a},
+                            None => panic!()
+                            }
+
+                            num_stack.push(x);
+                        }
+                    }
+
+                    current_id += 1;
+                },
                 DUP => {
                     if num_stack.len() < 1{
                         panic!("Runtime Error: not enough pushing");
@@ -442,6 +491,10 @@ fn get_address_name(address: &String, tokens: &Vec<Token>) -> usize {
     panic!("Runtime Error: invalid line number (lines start at 1)");
 }
 
+fn get_char_code(c: i32) -> &'static str {
+    CHARS.get((c - 32) as usize).unwrap()
+}
+
 struct Token {
     id : usize,
     key : Keyword,
@@ -461,7 +514,8 @@ enum Keyword {
     SAVE,
     RESTORE,
     ADDRESS,
-    ADDRESSKEY
+    ADDRESSKEY,
+    PRINTC
 }
 
 enum State {
