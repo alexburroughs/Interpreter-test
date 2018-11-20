@@ -1,6 +1,6 @@
 [package]
-name = "JessieScript"
+name = "jessie_script"
 version = "0.1.0"
-authors = ["alexburroughs <aburroughs00@live.com>"]
+authors = ["alexburroughs <aburroughs00@live.com>", "hollowbit <nathanael.maher@outlook.com>"]
 
 [dependencies]
