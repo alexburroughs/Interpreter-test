@@ -37,5 +37,4 @@ Anyone can contribute to JessieScript. The JSS interpretor is written in [Rust](
 ## Possible Future Implementations
 
 1. User Input
-2. Print ASCII characters
-3. Arrays (ref addresses)
+2. Arrays (ref addresses)
